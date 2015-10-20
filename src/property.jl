@@ -1,7 +1,7 @@
 
 
 abstract PropertyPrimitive
-
+Base.length(::PropertyPrimitive) = 1
 
 # Meaningless isless function used to sort in optimize_batching
 function Base.isless{T <: PropertyPrimitive}(a::T, b::T)
@@ -25,31 +25,12 @@ function Base.isless{T <: PropertyPrimitive}(a::T, b::T)
     return false
 end
 
-
-immutable Property{P <: PropertyPrimitive} <: ComposeNode
-	primitives::Vector{P}
-end
-
-
-function isempty(p::Property)
-    return isempty(p.primitives)
-end
-
-
-function isscalar(p::Property)
-    return length(p.primitives) == 1
-end
-
-
 # Some properties can be applied multiple times, most cannot.
-function isrepeatable(p::Property)
+function isrepeatable(p::PropertyPrimitive)
     return false
 end
 
-
-function resolve{T}(box::AbsoluteBox, units::UnitBox, t::Transform, p::Property{T})
-    return Property{T}([resolve(box, units, t, primitive) for primitive in p.primitives])
-end
+abstract Property{T}
 
 
 # Property primitive catchall: most properties don't need measure transforms
